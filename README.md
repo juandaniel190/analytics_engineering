@@ -114,6 +114,45 @@ WHERE is_missing_chargeback
 
 ---
 
+## Repo Layout
+
+```
+analytics_engineering/
+├── deel_dbt/
+│   ├── deelhome/
+│   │   ├── figures/                    # Charts and dbt lineage image
+│   │   ├── notebooks/
+│   │   │   └── deel_analysis.ipynb     # Analysis notebook
+│   │   ├── Deel Analytics Engineering Challenge .pdf
+│   │   └── Globe API Specification.html
+│   ├── macros/
+│   │   └── convert_to_usd.sql          # FX conversion macro (DuckDB + Postgres)
+│   ├── models/
+│   │   ├── staging/
+│   │   │   ├── stg_globepay__acceptance.sql
+│   │   │   ├── stg_globepay__chargeback.sql
+│   │   │   └── schema.yml
+│   │   └── marts/
+│   │       ├── fct_transactions.sql    # Production analyst model
+│   │       ├── fct_transactions_output.csv
+│   │       └── schema.yml
+│   ├── seeds/
+│   │   ├── globepay_acceptance_report.csv
+│   │   ├── globepay_chargeback_report.csv
+│   │   └── schema.yml
+│   ├── dbt_project.yml
+│   ├── packages.yml
+│   ├── package-lock.yml
+│   └── profiles.yml
+├── .env.example
+├── .gitignore
+├── requirements.txt
+├── README.md
+└── SETUP.md
+```
+
+---
+
 ## Quick Start
 
 ```bash
