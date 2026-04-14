@@ -11,7 +11,7 @@ Analysis of 5,430 Globepay payment transactions (Jan–Jun 2019) using dbt + Duc
 | `globepay_acceptance_report` | 5,430 | `external_ref`, `state` (ACCEPTED/DECLINED), `amount`, `currency`, `rates` (JSON), `cvv_provided` |
 | `globepay_chargeback_report` | 5,430 | `external_ref`, `chargeback` (TRUE/FALSE string) |
 
-- `amount` is in **major units** (dollars), not cents — decimal values like `1020.46` confirm this despite the API spec.
+- `amount` is in **major units** (dollars), not cents despite the API spec.
 - `rates` is a JSON string mapping ISO currency codes to units-per-1-USD, embedded per row.
 - Both datasets join 1:1 on `external_ref` with 100% coverage.
 
@@ -27,7 +27,7 @@ Medallion architecture: raw seeds → typed staging views → one wide mart tabl
 | Staging | view | `main_staging` | Type casting, boolean conversion, FX normalisation |
 | Mart | table | `main_marts` | `fct_transactions` — single analyst-ready model |
 
-**`fct_transactions`** — one row per transaction, all dimensions included:
+**`fct_transactions`** : one row per transaction, all dimensions included:
 
 | Column | Type | Description |
 |---|---|---|
@@ -45,21 +45,15 @@ Medallion architecture: raw seeds → typed staging views → one wide mart tabl
 
 ## 3. Lineage
 
-```
-globepay_acceptance_report  →  stg_globepay__acceptance  ─┐
-                                                           ├─►  fct_transactions
-globepay_chargeback_report  →  stg_globepay__chargeback  ─┘
-```
-
 ![dbt lineage](deel_dbt/deelhome/figures/dbt_lineage.png)
 
 ---
 
 ## 4. Tips
 
-**Macros:** `convert_to_usd(amount_col, rates_col, currency_col)` centralises FX conversion with database-specific branches (`duckdb` / `postgres`) for JSON parsing. Adding a new adapter requires only a new `{% elif %}` block — no model changes needed.
+**Macros:** `convert_to_usd(amount_col, rates_col, currency_col)` centralises FX conversion with database-specific branches (`duckdb` / `postgres`) for JSON parsing. Adding a new adapter requires only a new `{% elif %}` block.
 
-**Data validation:** Tests at every layer — seeds enforce column types to prevent silent coercions, staging catches nulls and duplicates on primary keys, and the mart's `is_missing_chargeback` flag acts as a live completeness monitor without a separate model.
+**Data validation:** Tests at every layer. Seeds enforce column types to prevent silent coercions, staging catches nulls and duplicates on primary keys, and the mart's `is_missing_chargeback` flag acts as a live completeness monitor without a separate model.
 
 **Documentation:** Every model, seed, and column has a `description` in `schema.yml`. Run `dbt docs generate && dbt docs serve` to browse the full data catalog.
 
@@ -71,7 +65,7 @@ Production model: `main_marts.fct_transactions`. All questions below are answere
 
 ### Q1 — What is the acceptance rate over time?
 
-**The acceptance rate is stable at 68–72% across all 26 weeks (Jan–Jun 2019),** with a mean of ~69.6%. No alarming trend or sudden drop. Volume grows modestly month-over-month.
+**The acceptance rate is stable at 68–72% across all 26 weeks (Jan–Jun 2019),** with a mean of ~70%. No alarming trend or sudden drop. Volume grows modestly month-over-month.
 
 <img src="deel_dbt/deelhome/figures/fig_01_weekly_acceptance_rate.png" width="580"/>
 <img src="deel_dbt/deelhome/figures/fig_02_monthly_rate_volume.png" width="580"/>
