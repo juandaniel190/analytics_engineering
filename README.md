@@ -1,6 +1,6 @@
-# Deel Analytics Engineer — Take-Home Challenge
+# Deel Analytics Engineer — Hometask Challenge
 
-Analysis of 5,430 Globepay payment transactions (Jan–Jun 2019) using dbt + DuckDB.
+Analysis of 5,430 Globepay payment transactions (Jan–Jun 2019) using dbt + DuckDB (Supabase optional).
 
 ---
 
