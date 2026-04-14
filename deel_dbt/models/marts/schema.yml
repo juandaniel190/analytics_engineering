@@ -1,0 +1,58 @@
+version: 2
+
+models:
+  - name: fct_transactions
+    description: >
+      Production-ready transaction fact table. One row per transaction attempt,
+      fully joined with chargeback data. All type casting and currency normalisation
+      happens upstream in staging — this model is safe for direct analyst consumption.
+      Use this model to answer any question about acceptance rates, declined volumes,
+      chargeback coverage, CVV impact, or any combination thereof.
+    columns:
+      - name: external_ref
+        description: Unique transaction identifier (primary key).
+        tests:
+          - unique
+          - not_null
+      - name: transaction_at
+        description: Timestamp of the transaction (UTC).
+        tests:
+          - not_null
+      - name: transaction_date
+        description: Calendar date of the transaction.
+      - name: transaction_week
+        description: First day of the ISO week.
+      - name: transaction_month
+        description: First day of the calendar month.
+      - name: source
+        description: Payment source / instrument type.
+      - name: country
+        description: ISO country code.
+        tests:
+          - not_null
+      - name: currency_local
+        description: ISO currency code of the original transaction.
+        tests:
+          - not_null
+      - name: amount_local
+        description: Original transaction amount in the local currency (major units).
+        tests:
+          - not_null
+      - name: amount_usd
+        description: Transaction amount in USD, converted via embedded FX rates.
+        tests:
+          - not_null
+      - name: is_accepted
+        description: True if the transaction was ACCEPTED, false if DECLINED.
+        tests:
+          - not_null
+      - name: is_cvv_provided
+        description: True if the CVC/CVV code was supplied by the cardholder.
+      - name: is_active
+        description: Whether the record is marked active in Globepay.
+      - name: has_chargeback
+        description: True if a chargeback was filed. Null if chargeback record is missing.
+      - name: is_missing_chargeback
+        description: True if no matching chargeback record exists for this transaction.
+        tests:
+          - not_null
